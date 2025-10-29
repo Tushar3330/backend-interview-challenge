@@ -1,7 +1,11 @@
 # Backend Interview Challenge - Task Sync API
 
+🚀 **Live Demo**: [https://backend-interview-challenge-gnk1.onrender.com](https://backend-interview-challenge-gnk1.onrender.com)
 
-This is a backend developer interview challenge focused on building a sync-enabled task management API. The challenge evaluates understanding of REST APIs, data synchronization, offline-first architecture, and conflict resolution
+This is a backend developer interview challenge focused on building a sync-enabled task management API. The challenge evaluates understanding of REST APIs, data synchronization, offline-first architecture, and conflict resolution.
+
+## 📚 Documentation
+
 Please read these documents in order:
 
 1. **[📋 Submission Instructions](./docs/SUBMISSION_INSTRUCTIONS.md)** - How to submit your solution (MUST READ)
@@ -14,11 +18,12 @@ Please read these documents in order:
 
 ## Challenge Overview
 
-Candidates are expected to implement a backend API that:
-- Manages tasks (CRUD operations)
-- Supports offline functionality with a sync queue
-- Handles conflict resolution when syncing
-- Provides robust error handling
+The API is fully implemented and deployed! You can:
+- 🌐 **Test it live**: Visit the [interactive web interface](https://backend-interview-challenge-gnk1.onrender.com)
+- 📮 **Use Postman**: Import `Task-Sync-API.postman_collection.json` for API testing
+- 🔗 **API Base URL**: `https://backend-interview-challenge-gnk1.onrender.com/api`
+
+
 
 ## Project Structure
 
@@ -39,11 +44,20 @@ backend-interview-challenge/
 
 ## Getting Started
 
-### Prerequisites
+### Quick Test (No Setup Required!)
+
+Visit the **live deployment** to test all endpoints instantly:
+👉 [https://backend-interview-challenge-gnk1.onrender.com](https://backend-interview-challenge-gnk1.onrender.com)
+
+**Note**: The free instance may take ~50 seconds to wake up on first request.
+
+### Local Development
+
+##### Prerequisites
 - Node.js (v18 or higher)
 - npm or yarn
 
-### Setup
+#### Setup
 1. Clone the repository
 2. Install dependencies:
    ```bash
@@ -68,7 +82,29 @@ backend-interview-challenge/
 - `npm run lint` - Run ESLint
 - `npm run typecheck` - Check TypeScript types
 
-## Your Task
+## Testing the API
+
+### Option 1: Interactive Web Interface (Recommended)
+Visit [https://backend-interview-challenge-gnk1.onrender.com](https://backend-interview-challenge-gnk1.onrender.com) for a user-friendly interface to test all endpoints.
+
+### Option 2: Postman Collection
+Import `Task-Sync-API.postman_collection.json` into Postman to test all API endpoints with pre-configured requests.
+
+### Option 3: cURL Examples
+```bash
+# Create a task
+curl -X POST https://backend-interview-challenge-gnk1.onrender.com/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test Task","description":"Testing the API"}'
+
+# Get all tasks
+curl https://backend-interview-challenge-gnk1.onrender.com/api/tasks
+
+# Trigger sync
+curl -X POST https://backend-interview-challenge-gnk1.onrender.com/api/sync/sync
+```
+
+## Implementation Details
 
 ### Key Implementation Files
 
