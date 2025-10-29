@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Sync API - Testing Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .endpoint-group {
+            margin-bottom: 30px;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .endpoint:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
+        .method.get { background: #61affe; color: white; }
+        .method.post { background: #49cc90; color: white; }
+        .method.put { background: #fca130; color: white; }
+        .method.delete { background: #f93e3e; color: white; }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .endpoint-desc {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .test-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .test-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .test-btn:active {
+            transform: translateY(0);
+        }
+
+        .response-area {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .response-area.show {
+            display: block;
+        }
+
+        .response-area pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .info-box h3 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .quick-action-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Task Sync API</h1>
+            <p>Backend Interview Challenge - Interactive Testing Interface</p>
+        </div>
+
+        <div class="content">
+            <div class="info-box">
+                <h3>📌 Quick Start</h3>
+                <p><strong>Base URL:</strong> <code id="baseUrl">Loading...</code></p>
+                <p style="margin-top: 10px;">Use the buttons below to test each endpoint. Results will appear in the response areas.</p>
+            </div>
+
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="runFullDemo()">🎬 Run Full Demo</button>
+                <button class="quick-action-btn" onclick="checkHealth()">💚 Health Check</button>
+                <button class="quick-action-btn" onclick="clearAllResponses()">🗑️ Clear All</button>
+            </div>
+
+            <div class="section">
+                <h2>📋 Task Management Endpoints</h2>
+                
+                <div class="endpoint-group">
+                    <div class="endpoint">
+                        <div>
+                            <span class="method post">POST</span>
+                            <span class="endpoint-path">/api/tasks</span>
+                        </div>
+                        <div class="endpoint-desc">Create a new task</div>
+                        <input type="text" id="createTitle" class="input-field" placeholder="Task title (required)" value="Buy groceries">
+                        <input type="text" id="createDesc" class="input-field" placeholder="Task description (optional)" value="Milk, eggs, bread">
+                        <button class="test-btn" onclick="createTask()">Test Create Task</button>
+                        <div class="response-area" id="response-create"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div>
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/api/tasks</span>
+                        </div>
+                        <div class="endpoint-desc">Get all non-deleted tasks</div>
+                        <button class="test-btn" onclick="getAllTasks()">Test Get All Tasks</button>
+                        <div class="response-area" id="response-getall"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div>
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/api/tasks/:id</span>
+                        </div>
+                        <div class="endpoint-desc">Get a specific task by ID</div>
+                        <input type="text" id="getTaskId" class="input-field" placeholder="Task ID">
+                        <button class="test-btn" onclick="getTask()">Test Get Task</button>
+                        <div class="response-area" id="response-get"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div>
+                            <span class="method put">PUT</span>
+                            <span class="endpoint-path">/api/tasks/:id</span>
+                        </div>
+                        <div class="endpoint-desc">Update an existing task</div>
+                        <input type="text" id="updateTaskId" class="input-field" placeholder="Task ID">
+                        <input type="text" id="updateTitle" class="input-field" placeholder="New title (optional)">
+                        <label style="display: block; margin: 10px 0;">
+                            <input type="checkbox" id="updateCompleted"> Mark as completed
+                        </label>
+                        <button class="test-btn" onclick="updateTask()">Test Update Task</button>
+                        <div class="response-area" id="response-update"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div>
+                            <span class="method delete">DELETE</span>
+                            <span class="endpoint-path">/api/tasks/:id</span>
+                        </div>
+                        <div class="endpoint-desc">Soft delete a task</div>
+                        <input type="text" id="deleteTaskId" class="input-field" placeholder="Task ID">
+                        <button class="test-btn" onclick="deleteTask()">Test Delete Task</button>
+                        <div class="response-area" id="response-delete"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🔄 Sync Endpoints</h2>
+                
+                <div class="endpoint-group">
+                    <div class="endpoint">
+                        <div>
+                            <span class="method post">POST</span>
+                            <span class="endpoint-path">/api/sync</span>
+                        </div>
+                        <div class="endpoint-desc">Trigger manual synchronization</div>
+                        <button class="test-btn" onclick="triggerSync()">Test Sync</button>
+                        <div class="response-area" id="response-sync"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div>
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/api/status</span>
+                        </div>
+                        <div class="endpoint-desc">Check sync status</div>
+                        <button class="test-btn" onclick="getSyncStatus()">Test Get Status</button>
+                        <div class="response-area" id="response-status"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div>
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/api/health</span>
+                        </div>
+                        <div class="endpoint-desc">Health check endpoint</div>
+                        <button class="test-btn" onclick="checkHealth()">Test Health Check</button>
+                        <div class="response-area" id="response-health"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        document.getElementById('baseUrl').textContent = API_BASE;
+
+        let createdTaskId = null;
+
+        function showResponse(elementId, data, status) {
+            const element = document.getElementById(elementId);
+            const statusBadge = status < 400 ? 
+                `<span class="status-badge status-success">✓ ${status}</span>` : 
+                `<span class="status-badge status-error">✗ ${status}</span>`;
+            
+            element.innerHTML = statusBadge + '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            element.classList.add('show');
+        }
+
+        async function createTask() {
+            const title = document.getElementById('createTitle').value;
+            const description = document.getElementById('createDesc').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/tasks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description })
+                });
+                const data = await response.json();
+                createdTaskId = data.id;
+                showResponse('response-create', data, response.status);
+                
+                // Auto-fill IDs in other fields
+                if (createdTaskId) {
+                    document.getElementById('getTaskId').value = createdTaskId;
+                    document.getElementById('updateTaskId').value = createdTaskId;
+                    document.getElementById('deleteTaskId').value = createdTaskId;
+                }
+            } catch (error) {
+                showResponse('response-create', { error: error.message }, 500);
+            }
+        }
+
+        async function getAllTasks() {
+            try {
+                const response = await fetch(`${API_BASE}/api/tasks`);
+                const data = await response.json();
+                showResponse('response-getall', data, response.status);
+            } catch (error) {
+                showResponse('response-getall', { error: error.message }, 500);
+            }
+        }
+
+        async function getTask() {
+            const id = document.getElementById('getTaskId').value;
+            if (!id) {
+                alert('Please enter a task ID');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/tasks/${id}`);
+                const data = await response.json();
+                showResponse('response-get', data, response.status);
+            } catch (error) {
+                showResponse('response-get', { error: error.message }, 500);
+            }
+        }
+
+        async function updateTask() {
+            const id = document.getElementById('updateTaskId').value;
+            const title = document.getElementById('updateTitle').value;
+            const completed = document.getElementById('updateCompleted').checked;
+            
+            if (!id) {
+                alert('Please enter a task ID');
+                return;
+            }
+            
+            const body = {};
+            if (title) body.title = title;
+            body.completed = completed;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/tasks/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await response.json();
+                showResponse('response-update', data, response.status);
+            } catch (error) {
+                showResponse('response-update', { error: error.message }, 500);
+            }
+        }
+
+        async function deleteTask() {
+            const id = document.getElementById('deleteTaskId').value;
+            if (!id) {
+                alert('Please enter a task ID');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/tasks/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.status === 204) {
+                    showResponse('response-delete', { message: 'Task deleted successfully' }, 204);
+                } else {
+                    const data = await response.json();
+                    showResponse('response-delete', data, response.status);
+                }
+            } catch (error) {
+                showResponse('response-delete', { error: error.message }, 500);
+            }
+        }
+
+        async function triggerSync() {
+            try {
+                const response = await fetch(`${API_BASE}/api/sync`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                showResponse('response-sync', data, response.status);
+            } catch (error) {
+                showResponse('response-sync', { error: error.message }, 500);
+            }
+        }
+
+        async function getSyncStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/api/status`);
+                const data = await response.json();
+                showResponse('response-status', data, response.status);
+            } catch (error) {
+                showResponse('response-status', { error: error.message }, 500);
+            }
+        }
+
+        async function checkHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                showResponse('response-health', data, response.status);
+            } catch (error) {
+                showResponse('response-health', { error: error.message }, 500);
+            }
+        }
+
+        async function runFullDemo() {
+            if (!confirm('This will run a full demo of all endpoints. Continue?')) {
+                return;
+            }
+            
+            clearAllResponses();
+            
+            // Step 1: Create task
+            document.getElementById('createTitle').value = 'Demo Task ' + Date.now();
+            await createTask();
+            await sleep(1000);
+            
+            // Step 2: Get all tasks
+            await getAllTasks();
+            await sleep(1000);
+            
+            // Step 3: Get specific task
+            if (createdTaskId) {
+                await getTask();
+                await sleep(1000);
+                
+                // Step 4: Update task
+                document.getElementById('updateTitle').value = 'Updated Demo Task';
+                document.getElementById('updateCompleted').checked = true;
+                await updateTask();
+                await sleep(1000);
+                
+                // Step 5: Check sync status
+                await getSyncStatus();
+                await sleep(1000);
+                
+                // Step 6: Trigger sync
+                await triggerSync();
+            }
+            
+            alert('Demo completed! Scroll down to see all responses.');
+        }
+
+        function clearAllResponses() {
+            const responses = document.querySelectorAll('.response-area');
+            responses.forEach(r => {
+                r.classList.remove('show');
+                r.innerHTML = '';
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Auto-load health status on page load
+        window.addEventListener('load', () => {
+            checkHealth();
+        });
+    </script>
+</body>
+</html>

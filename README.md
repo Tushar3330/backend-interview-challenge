@@ -1,15 +1,14 @@
 # Backend Interview Challenge - Task Sync API
 
-This is a backend developer interview challenge focused on building a sync-enabled task management API. The challenge evaluates understanding of REST APIs, data synchronization, offline-first architecture, and conflict resolution.
 
-## 📚 Documentation Overview
-
+This is a backend developer interview challenge focused on building a sync-enabled task management API. The challenge evaluates understanding of REST APIs, data synchronization, offline-first architecture, and conflict resolution
 Please read these documents in order:
 
 1. **[📋 Submission Instructions](./docs/SUBMISSION_INSTRUCTIONS.md)** - How to submit your solution (MUST READ)
 2. **[📝 Requirements](./docs/REQUIREMENTS.md)** - Detailed challenge requirements and implementation tasks
 3. **[🔌 API Specification](./docs/API_SPEC.md)** - Complete API documentation with examples
 4. **[🤖 AI Usage Guidelines](./docs/AI_GUIDELINES.md)** - Guidelines for using AI tools during the challenge
+
 
 **⚠️ Important**: DO NOT create pull requests against this repository. All submissions must be through private forks.
 
