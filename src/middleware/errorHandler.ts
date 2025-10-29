@@ -4,12 +4,12 @@ export interface AppError extends Error {
   statusCode?: number;
 }
 
-export function errorHandler(
+export const errorHandler = (
   err: AppError,
   req: Request,
   res: Response,
-  next: NextFunction
-): void {
+  _next: NextFunction
+) => {
   console.error('Error:', err);
 
   const statusCode = err.statusCode || 500;
