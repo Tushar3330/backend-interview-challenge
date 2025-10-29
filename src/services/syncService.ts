@@ -11,8 +11,7 @@ export class SyncService {
   
   constructor(
     private db: Database,
-    // TaskService kept for future enhancements
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
     private _taskService: TaskService,
     apiUrl: string = process.env.API_BASE_URL || 'http://localhost:3000/api'
   ) {
@@ -29,24 +28,23 @@ export class SyncService {
     };
 
     try {
-      // Get all items from sync queue ordered chronologically per task
+     
       const queueItems = await this.getSyncQueueItems();
 
       if (queueItems.length === 0) {
         return result;
       }
 
-      // Process items in batches
+
       for (let i = 0; i < queueItems.length; i += this.batchSize) {
         const batch = queueItems.slice(i, i + this.batchSize);
         
         try {
           const batchResponse = await this.processBatch(batch);
-          
-          // Process each item in the batch response
+
           for (const processedItem of batchResponse.processed_items) {
             if (processedItem.status === 'success' || processedItem.status === 'conflict') {
-              // Update sync status
+         
               await this.updateSyncStatus(
                 processedItem.client_id,
                 'synced',
@@ -56,11 +54,11 @@ export class SyncService {
                 }
               );
               
-              // Remove from sync queue
+        
               await this.removeFromSyncQueue(processedItem.client_id);
               result.synced_items++;
 
-              // Log conflict if it occurred
+         
               if (processedItem.status === 'conflict') {
                 result.errors.push({
                   task_id: processedItem.client_id,
@@ -70,7 +68,7 @@ export class SyncService {
                 });
               }
             } else {
-              // Handle error
+              
               const queueItem = batch.find(item => item.task_id === processedItem.client_id);
               if (queueItem) {
                 await this.handleSyncError(
@@ -88,7 +86,7 @@ export class SyncService {
             }
           }
         } catch (error) {
-          // Batch failed - handle each item
+          
           result.success = false;
           for (const item of batch) {
             await this.handleSyncError(item, error as Error);
@@ -103,7 +101,7 @@ export class SyncService {
         }
       }
 
-      // Update overall success status
+ 
       result.success = result.failed_items === 0;
       
     } catch (error) {
@@ -131,7 +129,7 @@ export class SyncService {
   }
 
   private async getSyncQueueItems(): Promise<SyncQueueItem[]> {
-    // Get items ordered by created_at to maintain chronological order per task
+  
     const rows = await this.db.all(
       `SELECT * FROM sync_queue 
        WHERE retry_count < ? 
@@ -151,16 +149,16 @@ export class SyncService {
   }
 
   private async processBatch(items: SyncQueueItem[]): Promise<BatchSyncResponse> {
-    // Prepare batch request
+   
     const batchRequest: BatchSyncRequest = {
       items,
       client_timestamp: new Date(),
     };
 
-    // Calculate checksum for batch integrity (as per CHALLENGE_CONSTRAINTS)
+  
     const checksum = this.calculateChecksum(items);
 
-    // Send to server
+  
     const response = await axios.post(`${this.apiUrl}/batch`, {
       ...batchRequest,
       checksum,
@@ -170,14 +168,13 @@ export class SyncService {
   }
 
   private calculateChecksum(items: SyncQueueItem[]): string {
-    // Simple checksum implementation - in production, use a proper hashing algorithm
+   
     const data = items.map(item => `${item.task_id}-${item.operation}`).join('|');
     return Buffer.from(data).toString('base64');
   }
 
   // Conflict resolution method (kept for future enhancements)
-  // Currently conflicts are handled on the server side
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   private async _resolveConflict(localTask: Task, serverTask: Task): Promise<Task> {
     // Implement last-write-wins conflict resolution
     const localTime = new Date(localTask.updated_at).getTime();
@@ -191,8 +188,7 @@ export class SyncService {
       console.log(`Conflict resolved: Server task ${localTask.id} is newer`);
       return serverTask;
     } else {
-      // Timestamps are equal - use operation priority from CHALLENGE_CONSTRAINTS
-      // For now, default to server wins on equal timestamps
+
       console.log(`Conflict resolved: Timestamps equal, using server version for task ${localTask.id}`);
       return serverTask;
     }
@@ -233,7 +229,7 @@ export class SyncService {
     const newRetryCount = item.retry_count + 1;
 
     if (newRetryCount >= this.maxRetries) {
-      // Move to dead letter queue (mark as failed)
+     
       await this.db.run(
         `UPDATE sync_queue 
          SET retry_count = ?, error_message = ? 
@@ -241,7 +237,7 @@ export class SyncService {
         [newRetryCount, error.message, item.id]
       );
 
-      // Update task status to 'failed'
+  
       await this.db.run(
         `UPDATE tasks SET sync_status = ? WHERE id = ?`,
         ['failed', item.task_id]
@@ -249,7 +245,7 @@ export class SyncService {
 
       console.error(`Task ${item.task_id} moved to dead letter queue after ${this.maxRetries} attempts`);
     } else {
-      // Increment retry count and store error message
+
       await this.db.run(
         `UPDATE sync_queue 
          SET retry_count = ?, error_message = ? 
@@ -257,7 +253,7 @@ export class SyncService {
         [newRetryCount, error.message, item.id]
       );
 
-      // Update task status to 'error' (will retry)
+ 
       await this.db.run(
         `UPDATE tasks SET sync_status = ? WHERE id = ?`,
         ['error', item.task_id]
@@ -318,9 +314,7 @@ export class SyncService {
     return !!this.db && !!this._taskService;
   }
 
-  // Conflict resolution method (kept for future enhancements)
-  // Currently conflicts are handled on the server side
-  // This method can be used when implementing client-side conflict resolution
+
   canResolveConflicts(): boolean {
     return typeof this._resolveConflict === 'function';
   }
